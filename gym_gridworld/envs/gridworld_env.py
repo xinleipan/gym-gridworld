@@ -1,28 +1,30 @@
-"""
-Implementation of gridworld MDP. 
-Copyright @ xinleipan
-    
-Xinlei Pan, 2017
-xinleipan@gmail.com
-"""
-
+import gymi, sys, time, copy
+from gym import error, spaces, utils
+from gym.utils import seeding
 import numpy as np
 from PIL import Image as Image
 import matplotlib.pyplot as plt
-import time,pdb,sys
-import copy
 
+# define colors
 # 0: black; 1 : gray; 2 : blue; 3 : green; 4 : red
-COLORS = {0:[0.0,0.0,0.0], 1:[0.5,0.5,0.5], 2:[0,0,1], 3:[0,1,0], 4:[1,0,0], 6:[1,0,1], 7:[1,1,0]} 
+COLORS = {0:[0.0,0.0,0.0], 1:[0.5,0.5,0.5], 2:[0,0,1], 3:[0,1,0], 4:[1,0,0], 6:[1,0,1], 7:[1,1,0]}
 
-class GridWorld(object):
-    """ GridWorld MDP """
-
-    def __init__(self, grid_size, grid_map_path, verbose=False, restart=False, show_partial=False):
-        self.actions = (0,1,2,3,4) # stay, move up, down, left, right
+class GridworldEnv(gym.Env):
+    metadata={'render.modes': ['human']}
+    
+    def __init__(self, grid_size=128, grid_map_path='plan2.txt', verbose=False, restart=False, show_partial=False):
+        # action space
+        self.actions=(0,1,2,3,4)    # stay, move up, down, left, right
         self.action_pos = {0:[0,0], 1:[-1, 0], 2:[1, 0], 3:[0,-1], 4:[0,1]}
+        self.action_space = spaces.Discrete(len(self.actions))
+        
+        # observation space
+        self.observation_space = spaces.Box(low=0, high=1,shape=[grid_size, grid_size, 3])
         self.grid_size = grid_size
         self.states = np.random.randn(grid_size, grid_size, 3) * 0.0
+        
+        # rendering
+        self.viewer = None
         self.verbose = verbose
         self.show_part = show_partial
         self.grid_map_path = grid_map_path
@@ -32,15 +34,16 @@ class GridWorld(object):
             k1s = k1.split(' ')
             tmp_arr = []
             for k2 in k1s:
-                 try:
+                try:
                     tmp_arr.append(int(k2))
-                 except:
+                except:
                     pass
             grid_map_array.append(tmp_arr)
         grid_map_array = np.array(grid_map_array)
         self.grid_unit = int(grid_size/grid_map_array.shape[0])
         self.obs = np.random.randn(int(grid_size/grid_map_array.shape[0]*3), \
                                     int(grid_size/grid_map_array.shape[0]*3),3)
+
 
         if grid_size % grid_map_array.shape[0] != 0:
             sys.exit('Grid size must be multiplies of grid map array shape!')
@@ -61,32 +64,61 @@ class GridWorld(object):
         self.start_state = copy.deepcopy(self.states)
         self.restart = copy.deepcopy(restart)
         self.obs = self.update_obs(self.states)        
+        '''
         if verbose == True:
             self.fig = plt.figure(1)
             plt.show(block=False)
             plt.axis('off')
-            self.render()
+            self._render()
+        '''
 
-    def update_obs(self, states):
-        obs = states[int((self.position[0]-1)*self.grid_unit):int((self.position[0]+2)*self.grid_unit), int((self.position[1]-1)*self.grid_unit):int((self.position[1]+2)*self.grid_unit),:]
-        return obs
+    def _step(self, action):
+        self._take_action(action)
 
-    def reset(self):
+    def _reset(self):
         self.position = copy.deepcopy(self.start)
         self.grid_map_array = copy.deepcopy(self.start_grid)
         self.states = copy.deepcopy(self.start_state)
         self.obs = self.update_obs(self.states)
         if self.verbose:
-            self.render()
+            self._render()
         if self.show_part:
             return self.obs
         elif self.show_part == False:
             return self.states
 
+    def _render(self, mode='human', close=False):
+        close = not self.verbose
+        if close:
+            if self.viewer is not None:
+                self.viewer.close()
+                self.viewer = None
+            return
+        if self.show_part:
+            self.obs = self.states[int((self.position[0]-1)*self.grid_unit):int((self.position[0]+2)*self.grid_unit), int((self.position[1]-1)*self.grid_unit):int((self.position[1]+2)*self.grid_unit),:]
+            img = self.obs
+        else:
+            img = self.states
+        from gym.envs.classic_control import rendering
+        if self.viewer is None:
+            self.viewer = rendering.SimpleImageViewer()
+        self.viewer.imshow(img)
+        '''
+        fig = plt.figure(1)
+        plt.clf()  
+        plt.imshow(img)
+        fig.canvas.draw()
+        plt.pause(0.00001)
+        '''
+   
+    def update_obs(self, states):
+        obs = states[int((self.position[0]-1)*self.grid_unit):int((self.position[0]+2)*self.grid_unit), int((self.position[1]-1)*self.grid_unit):int((self.position[1]+2)*self.grid_unit),:]
+        return obs
+        
     def retarget(self, sp):
         """ set the environment start position """
         if self.start[0]==sp[0] and self.start[1]==sp[1]:
-            self.reset()
+            self._reset()
             return
         elif self.start_grid[sp[0], sp[1]] != 0:
             return
@@ -99,15 +131,15 @@ class GridWorld(object):
             self.states = self.update_state(self.grid_map_array)
             self.start_state = copy.deepcopy(self.states)
             self.position = copy.deepcopy(self.start)
-            self.reset()
+            self._reset()
             if self.verbose:
-                self.render()
+                self._render()
         return
     
     def change_target(self, tg):
         """ set the environment target position """
         if self.target[0] == tg[0] and self.target[1] == tg[1]:
-            self.reset()
+            self._reset()
             return
         elif self.start_grid[tg[0], tg[1]] != 0:
             return
@@ -120,9 +152,9 @@ class GridWorld(object):
             self.states = self.update_state(self.grid_map_array)
             self.start_state = copy.deepcopy(self.states)
             self.position = copy.deepcopy(self.start)
-            self.reset()
+            self._reset()
             if self.verbose:
-                self.render()
+                self._render()
         return        
     
     def update_state(self, grid_map_array):
@@ -135,22 +167,8 @@ class GridWorld(object):
                     this_value = COLORS[grid_map_array[i,j]][k]
                     state[i*gs : (i+1)*gs , j*gs : (j+1)*gs, k] = this_value
         return state                
-    
-    def render(self):
-        if self.verbose == False:
-            return
-        if self.show_part:
-            self.obs = self.states[int((self.position[0]-1)*self.grid_unit):int((self.position[0]+2)*self.grid_unit), int((self.position[1]-1)*self.grid_unit):int((self.position[1]+2)*self.grid_unit),:]
-            img = self.obs
-        else:
-            img = self.states
-        fig = plt.figure(1)
-        plt.clf()  
-        plt.imshow(img)
-        fig.canvas.draw()
-        plt.pause(0.00001)
         
-    def step(self, action):
+    def _take_action(self, action):
         """ return next state, reward, finished, success """
         tmp_pos = (self.position[0] + self.action_pos[action][0],
                    self.position[1] + self.action_pos[action][1])
@@ -162,7 +180,7 @@ class GridWorld(object):
                 return (self.states, -1, False, True)
         if tmp_pos[0] < 0 or tmp_pos[0] > self.grid_map_array_shape or tmp_pos[1] < 0 or tmp_pos[1] > self.grid_map_array_shape:
             if self.verbose:
-                self.render()
+                self._render()
             self.obs = self.update_obs(self.states)
             if self.show_part:
                 return (self.obs, -1, False, False)
@@ -183,7 +201,7 @@ class GridWorld(object):
             self.position = copy.deepcopy(tmp_pos)
         elif new_color == 1: # gray
             if self.verbose:
-                self.render()
+                self._render()
             # print('new color is gray')
             self.obs = self.update_obs(self.states)
             if self.show_part:
@@ -198,7 +216,7 @@ class GridWorld(object):
         self.states = self.update_state(self.grid_map_array)
         self.obs = self.update_obs(self.states)
         if self.verbose:
-            self.render()
+            self._render()
         if tmp_pos[0] == self.target[0] and tmp_pos[1] == self.target[1]:
             target_state = copy.deepcopy(self.states)
             if self.restart:
@@ -207,7 +225,7 @@ class GridWorld(object):
                 self.grid_map_array = copy.deepcopy(self.start_grid)
                 self.obs = self.update_obs(self.states)
             if self.verbose:
-                self.render()
+                self._render()
             if self.show_part:
                 return (self.update_obs(target_state), 2, True, True)
             else:
