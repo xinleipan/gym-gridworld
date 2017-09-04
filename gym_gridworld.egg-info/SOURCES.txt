@@ -1,5 +1,0 @@
-gym_gridworld.egg-info/PKG-INFO
-gym_gridworld.egg-info/SOURCES.txt
-gym_gridworld.egg-info/dependency_links.txt
-gym_gridworld.egg-info/requires.txt
-gym_gridworld.egg-info/top_level.txt
