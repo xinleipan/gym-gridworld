@@ -211,3 +211,7 @@ class GridworldEnv(gym.Env):
                 return True
         else:
             return False
+
+    def _close_env(self):
+        plt.close(1)
+        return 
