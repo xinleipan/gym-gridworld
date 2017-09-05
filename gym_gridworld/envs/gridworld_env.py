@@ -28,7 +28,7 @@ class GridworldEnv(gym.Env):
                         shape=self.obs_shape)
     
         ''' initialize system state ''' 
-        self.grid_map_path = 'plan2.txt'
+        self.grid_map_path = 'plan5.txt'
         self.start_grid_map = self._read_grid_map(self.grid_map_path) # initial grid map
         self.current_grid_map = copy.deepcopy(self.start_grid_map)  # current grid map
         self.observation = self._gridmap_to_observation(self.start_grid_map)
