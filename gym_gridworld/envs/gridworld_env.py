@@ -1,5 +1,5 @@
 import gym
-import sys 
+import sys, os
 import time
 import copy
 from gym import error, spaces, utils
@@ -28,7 +28,9 @@ class GridworldEnv(gym.Env):
                         shape=self.obs_shape)
     
         ''' initialize system state ''' 
-        self.grid_map_path = 'plan5.txt'
+        this_file_path = os.path.dirname(os.path.realpath(__file__))
+        self.grid_map_path = os.path.join(this_file_path, 'plan5.txt')
+        print(this_file_path)
         self.start_grid_map = self._read_grid_map(self.grid_map_path) # initial grid map
         self.current_grid_map = copy.deepcopy(self.start_grid_map)  # current grid map
         self.observation = self._gridmap_to_observation(self.start_grid_map)
