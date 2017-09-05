@@ -40,7 +40,7 @@ class GridworldEnv(gym.Env):
 
         ''' set other parameters '''
         self.restart_once_done = True  # restart or not once done
-        self.verbose = False # to show the environment or not
+        self.verbose = True # to show the environment or not
     
         if self.verbose == True:
             self.fig = plt.figure(1)
