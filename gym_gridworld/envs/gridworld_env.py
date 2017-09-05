@@ -15,7 +15,7 @@ COLORS = {0:[0.0,0.0,0.0], 1:[0.5,0.5,0.5], 2:[0.0,0.0,1.0], 3:[0.0,1.0,0.0], \
 
 class GridworldEnv(gym.Env):
     metadata = {'render.modes': ['human']}
-    
+    num_env = 0 
     def __init__(self):
         self.actions = (0, 1, 2, 3, 4)
         self.action_space = spaces.Discrete(5)
@@ -43,7 +43,8 @@ class GridworldEnv(gym.Env):
         self.verbose = True # to show the environment or not
     
         if self.verbose == True:
-            self.fig = plt.figure(1)
+            GridworldEnv.num_env += 1
+            self.fig = plt.figure(GridworldEnv.num_env)
             plt.show(block=False)
             plt.axis('off')
             self._render()
@@ -141,7 +142,7 @@ class GridworldEnv(gym.Env):
         if self.verbose == False:
             return
         img = self.observation
-        fig = plt.figure(1)
+        fig = plt.figure(GridworldEnv.num_env)
         plt.clf()
         plt.imshow(img)
         fig.canvas.draw()
