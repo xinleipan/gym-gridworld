@@ -11,26 +11,23 @@ import matplotlib.pyplot as plt
 # define colors
 # 0: black; 1 : gray; 2 : blue; 3 : green; 4 : red
 COLORS = {0:[0.0,0.0,0.0], 1:[0.5,0.5,0.5], 2:[0.0,0.0,1.0], 3:[0.0,1.0,0.0], \
-            4:[1.0,0.0,0.0], 6:[1.0,0.0,1.0], 7:[1.0,1.0,0.0]}
+        4:[1.0,0.0,0.0], 6:[1.0,0.0,1.0], 7:[1.0,1.0,0.0]}
 
 class GridworldEnv(gym.Env):
-    metadata={'render.modes': ['human']}
+    metadata = {'render.modes': ['human']}
     
     def __init__(self):
-    	''' set action space '''
-        self.actions=(0, 1, 2, 3, 4) # stay, move up, move down, move left, move right
+        self.actions = (0, 1, 2, 3, 4)
         self.action_space = spaces.Discrete(5)
-        self.action_pos_dict = {0:[0,0], 1:[-1, 0], 2:[1,0], 3:[0,-1], 4:[0,1]}
-        
+        self.action_pos_dict = {0: [0,0], 1:[-1, 0], 2:[1,0], 3:[0,-1], 4:[0,1]}
+ 
         ''' set observation space '''
         self.obs_shape = [128, 128, 3]  # observation space shape
-        self.observation_space = spaces.Box(low=0, high=1,
-                        shape=self.obs_shape)
+        self.observation_space = spaces.Box(low=0, high=1, shape=self.obs_shape)
     
         ''' initialize system state ''' 
         this_file_path = os.path.dirname(os.path.realpath(__file__))
-        self.grid_map_path = os.path.join(this_file_path, 'plan5.txt')
-        print(this_file_path)
+        self.grid_map_path = os.path.join(this_file_path, 'plan5.txt')        
         self.start_grid_map = self._read_grid_map(self.grid_map_path) # initial grid map
         self.current_grid_map = copy.deepcopy(self.start_grid_map)  # current grid map
         self.observation = self._gridmap_to_observation(self.start_grid_map)
@@ -214,4 +211,3 @@ class GridworldEnv(gym.Env):
                 return True
         else:
             return False
-
