@@ -125,7 +125,9 @@ class GridworldEnv(gym.Env):
             sys.exit('Start or target state not specified')
         return start_state, target_state
 
-    def _gridmap_to_observation(self, grid_map, obs_shape=self.obs_shape):
+    def _gridmap_to_observation(self, grid_map, obs_shape=None):
+        if obs_shape is None:
+            obs_shape = self.obs_shape
         observation = np.random.randn(*obs_shape)*0.0
         gs0 = int(observation.shape[0]/grid_map.shape[0])
         gs1 = int(observation.shape[1]/grid_map.shape[1])
