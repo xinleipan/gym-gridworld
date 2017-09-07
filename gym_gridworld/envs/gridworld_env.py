@@ -201,7 +201,7 @@ class GridworldEnv(gym.Env):
         ''' get current target state '''
         return self.agent_target_state
 
-    def jump_to_state(self, to_state):
+    def _jump_to_state(self, to_state):
         ''' move agent to another state '''
         if self.current_grid_map[to_state[0], to_state[1]] == 0:
             if self.current_grid_map[self.agent_state[0], self.agent_state[1]] == 4:
@@ -244,4 +244,8 @@ class GridworldEnv(gym.Env):
 
     def _close_env(self):
         plt.close(1)
-        return 
+        return
+    
+    def jump_to_state(self, to_state):
+        a, b, c, d = self._jump_to_state(to_state)
+        return (a, b, c, d) 
