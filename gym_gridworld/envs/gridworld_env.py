@@ -1,5 +1,6 @@
 import gym
-import sys, os
+import sys
+import os
 import time
 import copy
 from gym import error, spaces, utils
@@ -10,8 +11,10 @@ import matplotlib.pyplot as plt
 
 # define colors
 # 0: black; 1 : gray; 2 : blue; 3 : green; 4 : red
-COLORS = {0:[0.0,0.0,0.0], 1:[0.5,0.5,0.5], 2:[0.0,0.0,1.0], 3:[0.0,1.0,0.0], \
-        4:[1.0,0.0,0.0], 6:[1.0,0.0,1.0], 7:[1.0,1.0,0.0]}
+COLORS = {0:[0.0,0.0,0.0], 1:[0.5,0.5,0.5], \
+          2:[0.0,0.0,1.0], 3:[0.0,1.0,0.0], \
+          4:[1.0,0.0,0.0], 6:[1.0,0.0,1.0], \
+          7:[1.0,1.0,0.0]}
 
 class GridworldEnv(gym.Env):
     metadata = {'render.modes': ['human']}
@@ -35,8 +38,10 @@ class GridworldEnv(gym.Env):
         self.grid_map_shape = self.start_grid_map.shape
 
         ''' agent state: start, target, current state '''
-        self.agent_start_state, _ = self._get_agent_start_target_state(self.start_grid_map)
-        _, self.agent_target_state = self._get_agent_start_target_state(self.start_grid_map)
+        self.agent_start_state, _ = self._get_agent_start_target_state(
+                                    self.start_grid_map)
+        _, self.agent_target_state = self._get_agent_start_target_state(
+                                    self.start_grid_map)
         self.agent_state = copy.deepcopy(self.agent_start_state)
 
         ''' set other parameters '''
