@@ -45,7 +45,7 @@ class GridworldEnv(gym.Env):
         self.agent_state = copy.deepcopy(self.agent_start_state)
 
         ''' set other parameters '''
-        self.restart_once_done = True  # restart or not once done
+        self.restart_once_done = False  # restart or not once done
         self.verbose = False # to show the environment or not
     
         if self.verbose == True:
@@ -61,7 +61,7 @@ class GridworldEnv(gym.Env):
         nxt_agent_state = (self.agent_state[0] + self.action_pos_dict[action][0],
                             self.agent_state[1] + self.action_pos_dict[action][1])
         if action == 0: # stay in place
-            return (self.observation, -1, False, True) 
+            return (self.observation, 0, False, True) 
         if nxt_agent_state[0] < 0 or nxt_agent_state[1] >= self.grid_map_shape[0]:
             return (self.observation, -1, False, False)
         if nxt_agent_state[1] < 0 or nxt_agent_state[1] >= self.grid_map_shape[1]:
@@ -89,9 +89,9 @@ class GridworldEnv(gym.Env):
             target_observation = copy.deepcopy(self.observation)
             if self.restart_once_done:
                 self.observation = self._reset()
-                return (self.observation, 2, True, True)
+                return (self.observation, 1, True, True)
             else:
-                return (target_observation, 2, True, True)
+                return (target_observation, 1, True, True)
         else:
             return (self.observation, 0, False, True)
  
@@ -233,7 +233,7 @@ class GridworldEnv(gym.Env):
         elif self.current_grid_map[to_state[0], to_state[1]] == 4:
             return (self.observation, 0, False, True)
         elif self.current_grid_map[to_state[0], to_state[1]] == 1:
-            return (self.observation, 0, False, False)
+            return (self.observation, -1, False, False)
         elif self.current_grid_map[to_state[0], to_state[1]] == 3:
             self.current_grid_map[self.agent_state[0], self.agent_state[1]] = 0
             self.current_grid_map[to_state[0], to_state[1]] = 7
@@ -242,10 +242,10 @@ class GridworldEnv(gym.Env):
             self._render()
             if self.restart_once_done:
                 self.observation = self._reset()
-                return (self.observation, 2, True, True)
-            return (self.observation, 2, True, True)
+                return (self.observation, 1, True, True)
+            return (self.observation, 1, True, True)
         else:
-            return (self.observation, 0, False, False)
+            return (self.observation, -1, False, False)
 
     def _close_env(self):
         plt.close(1)
