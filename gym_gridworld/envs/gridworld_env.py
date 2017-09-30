@@ -31,7 +31,7 @@ class GridworldEnv(gym.Env):
     
         ''' initialize system state ''' 
         this_file_path = os.path.dirname(os.path.realpath(__file__))
-        self.grid_map_path = os.path.join(this_file_path, 'plan5.txt')        
+        self.grid_map_path = os.path.join(this_file_path, 'plan4.txt')        
         self.start_grid_map = self._read_grid_map(self.grid_map_path) # initial grid map
         self.current_grid_map = copy.deepcopy(self.start_grid_map)  # current grid map
         self.observation = self._gridmap_to_observation(self.start_grid_map)
@@ -47,10 +47,11 @@ class GridworldEnv(gym.Env):
         ''' set other parameters '''
         self.restart_once_done = False  # restart or not once done
         self.verbose = False # to show the environment or not
-    
+
+        GridworldEnv.num_env += 1
+        self.this_fig_num = GridworldEnv.num_env 
         if self.verbose == True:
-            GridworldEnv.num_env += 1
-            self.fig = plt.figure(GridworldEnv.num_env)
+            self.fig = plt.figure(self.this_fig_num)
             plt.show(block=False)
             plt.axis('off')
             self._render()
@@ -148,7 +149,7 @@ class GridworldEnv(gym.Env):
         if self.verbose == False:
             return
         img = self.observation
-        fig = plt.figure(GridworldEnv.num_env)
+        fig = plt.figure(self.this_fig_num)
         plt.clf()
         plt.imshow(img)
         fig.canvas.draw()
