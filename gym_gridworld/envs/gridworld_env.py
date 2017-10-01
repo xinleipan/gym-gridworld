@@ -62,7 +62,7 @@ class GridworldEnv(gym.Env):
         nxt_agent_state = (self.agent_state[0] + self.action_pos_dict[action][0],
                             self.agent_state[1] + self.action_pos_dict[action][1])
         if action == 0: # stay in place
-            return (self.observation, 0, False, True) 
+            return (self.observation, -1, False, True) 
         if nxt_agent_state[0] < 0 or nxt_agent_state[1] >= self.grid_map_shape[0]:
             return (self.observation, -1, False, False)
         if nxt_agent_state[1] < 0 or nxt_agent_state[1] >= self.grid_map_shape[1]:
