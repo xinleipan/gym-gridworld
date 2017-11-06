@@ -62,11 +62,11 @@ class GridworldEnv(gym.Env):
         nxt_agent_state = (self.agent_state[0] + self.action_pos_dict[action][0],
                             self.agent_state[1] + self.action_pos_dict[action][1])
         if action == 0: # stay in place
-            return (self.observation, 0, False, True) 
+            return (self.observation, -20, False, True) 
         if nxt_agent_state[0] < 0 or nxt_agent_state[1] >= self.grid_map_shape[0]:
-            return (self.observation, -0.1, False, False)
+            return (self.observation, -20, False, False)
         if nxt_agent_state[1] < 0 or nxt_agent_state[1] >= self.grid_map_shape[1]:
-            return (self.observation, -0.1, False, False)
+            return (self.observation, -20, False, False)
         # successful behavior
         org_color = self.current_grid_map[self.agent_state[0], self.agent_state[1]]
         new_color = self.current_grid_map[nxt_agent_state[0], nxt_agent_state[1]]
@@ -79,7 +79,7 @@ class GridworldEnv(gym.Env):
                 self.current_grid_map[nxt_agent_state[0], nxt_agent_state[1]] = 4
             self.agent_state = copy.deepcopy(nxt_agent_state)
         elif new_color == 1: # gray
-            return (self.observation, -0.1, False, False)
+            return (self.observation, -20, False, False)
         elif new_color == 2 or new_color == 3:
             self.current_grid_map[self.agent_state[0], self.agent_state[1]] = 0
             self.current_grid_map[nxt_agent_state[0], nxt_agent_state[1]] = new_color + 4
@@ -90,9 +90,9 @@ class GridworldEnv(gym.Env):
             target_observation = copy.deepcopy(self.observation)
             if self.restart_once_done:
                 self.observation = self._reset()
-                return (self.observation, 10, True, True)
+                return (self.observation, 1, True, True)
             else:
-                return (target_observation, 10, True, True)
+                return (target_observation, 1, True, True)
         else:
             return (self.observation, 0, False, True)
  
