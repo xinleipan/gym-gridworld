@@ -75,10 +75,10 @@ class GridworldEnv(gym.Env):
                 self.current_grid_map[self.agent_state[0], self.agent_state[1]] = 0
                 self.current_grid_map[nxt_agent_state[0], nxt_agent_state[1]] = 4
             elif org_color == 6 or org_color == 7:
-                self.current_grid_map[self.agent_state[0], self.agent_state[1]] = 2 
+                self.current_grid_map[self.agent_state[0], self.agent_state[1]] = 6 
                 self.current_grid_map[nxt_agent_state[0], nxt_agent_state[1]] = 4
             elif org_color == 2:
-                self.current_grid_map[self.agent_state[0], self.agent_state[1]] = 6
+                self.current_grid_map[self.agent_state[0], self.agent_state[1]] = 2
                 self.current_grid_map[nxt_agent_state[0], nxt_agent_state[1]] = 4
             self.agent_state = copy.deepcopy(nxt_agent_state)
         elif new_color == 1: # gray
@@ -145,7 +145,7 @@ class GridworldEnv(gym.Env):
                 this_value = start_grid_map[i,j]
                 if this_value == 4:
                     start_state = [i,j]
-                if this_value == 3:
+                if this_value == 2:
                     target_state = [i,j]
         if start_state is None or target_state is None:
             sys.exit('Start or target state not specified')
