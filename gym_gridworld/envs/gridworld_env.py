@@ -31,7 +31,7 @@ class GridworldEnv(gym.Env):
     
         ''' initialize system state ''' 
         this_file_path = os.path.dirname(os.path.realpath(__file__))
-        self.grid_map_path = os.path.join(this_file_path, 'plan4.txt')        
+        self.grid_map_path = os.path.join(this_file_path, 'plan0.txt')        
         self.start_grid_map = self._read_grid_map(self.grid_map_path) # initial grid map
         self.current_grid_map = copy.deepcopy(self.start_grid_map)  # current grid map
         self.observation = self._gridmap_to_observation(self.start_grid_map)
@@ -64,9 +64,9 @@ class GridworldEnv(gym.Env):
         if action == 0: # stay in place
             return (self.observation, 0, False, True) 
         if nxt_agent_state[0] < 0 or nxt_agent_state[0] >= self.grid_map_shape[0]:
-            return (self.observation, -0.1, False, False)
+            return (self.observation, 0, False, False)
         if nxt_agent_state[1] < 0 or nxt_agent_state[1] >= self.grid_map_shape[1]:
-            return (self.observation, -0.1, False, False)
+            return (self.observation, 0, False, False)
         # successful behavior
         org_color = self.current_grid_map[self.agent_state[0], self.agent_state[1]]
         new_color = self.current_grid_map[nxt_agent_state[0], nxt_agent_state[1]]
@@ -75,17 +75,25 @@ class GridworldEnv(gym.Env):
                 self.current_grid_map[self.agent_state[0], self.agent_state[1]] = 0
                 self.current_grid_map[nxt_agent_state[0], nxt_agent_state[1]] = 4
             elif org_color == 6 or org_color == 7:
-                self.current_grid_map[self.agent_state[0], self.agent_state[1]] = org_color - 4
+                self.current_grid_map[self.agent_state[0], self.agent_state[1]] = 2 
+                self.current_grid_map[nxt_agent_state[0], nxt_agent_state[1]] = 4
+            elif org_color == 2:
+                self.current_grid_map[self.agent_state[0], self.agent_state[1]] = 6
                 self.current_grid_map[nxt_agent_state[0], nxt_agent_state[1]] = 4
             self.agent_state = copy.deepcopy(nxt_agent_state)
         elif new_color == 1: # gray
-            return (self.observation, -0.1, False, False)
+            return (self.observation, 0, False, False)
         elif new_color == 2 or new_color == 3:
             self.current_grid_map[self.agent_state[0], self.agent_state[1]] = 0
-            self.current_grid_map[nxt_agent_state[0], nxt_agent_state[1]] = new_color + 4
+            self.current_grid_map[nxt_agent_state[0], nxt_agent_state[1]] = 6
+            self.agent_state = copy.deepcopy(nxt_agent_state)
+        elif new_color == 6:
+            self.current_grid_map[self.agent_state[0], self.agent_state[1]] = 0
+            self.current_grid_map[nxt_agent_state[0], nxt_agent_state[1]] = 2
             self.agent_state = copy.deepcopy(nxt_agent_state)
         self.observation = self._gridmap_to_observation(self.current_grid_map)
         self._render()
+        '''
         if nxt_agent_state[0] == self.agent_target_state[0] and nxt_agent_state[1] == self.agent_target_state[1] :
             target_observation = copy.deepcopy(self.observation)
             if self.restart_once_done:
@@ -95,7 +103,18 @@ class GridworldEnv(gym.Env):
                 return (target_observation, 1, True, True)
         else:
             return (self.observation, 0, False, True)
- 
+        '''
+        # causal reward
+        if np.any(self.current_grid_map==2) == False:
+            return (self.observation, 1, True, True)
+        else:
+            return (self.observation, 0, False, True)
+        # correlation reward
+        # if new_color == 2:
+        #    return (self.observation, 1, False, True)
+        # else:
+        #    return (self.observation, 0, False, True)
+
     def _reset(self):
         self.agent_state = copy.deepcopy(self.agent_start_state)
         self.current_grid_map = copy.deepcopy(self.start_grid_map)
