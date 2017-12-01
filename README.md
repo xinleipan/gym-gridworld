@@ -18,6 +18,6 @@ for reinforcement learning research.
     
 ## Visualize gym-gridworld
 In order to visualize the gridworld, you need to set `env.verbose` to `True`
-    
-   env.verbose = True
-   _ = env.reset()
+
+    env.verbose = True
+    _ = env.reset()
