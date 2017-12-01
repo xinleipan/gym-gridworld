@@ -6,6 +6,7 @@ for reinforcement learning research.
 ## Install gym-gridworld
 
 install virtual environment for gridworld
+
     cd gym-gridworld
     conda env create -f environment.yml
     source gridworld
