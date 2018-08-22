@@ -20,6 +20,7 @@ class GridworldEnv(gym.Env):
     metadata = {'render.modes': ['human']}
     num_env = 0 
     def __init__(self):
+        self._seed = 0
         self.actions = [0, 1, 2, 3, 4]
         self.inv_actions = [0, 2, 1, 4, 3]
         self.action_space = spaces.Discrete(5)
@@ -27,7 +28,7 @@ class GridworldEnv(gym.Env):
  
         ''' set observation space '''
         self.obs_shape = [128, 128, 3]  # observation space shape
-        self.observation_space = spaces.Box(low=0, high=1, shape=self.obs_shape)
+        self.observation_space = spaces.Box(low=0, high=1, shape=self.obs_shape, dtype=np.float32)
     
         ''' initialize system state ''' 
         this_file_path = os.path.dirname(os.path.realpath(__file__))
@@ -56,7 +57,7 @@ class GridworldEnv(gym.Env):
             plt.axis('off')
             self._render()
 
-    def _step(self, action):
+    def step(self, action):
         ''' return next observation, reward, finished, success '''
         action = int(action)
         info = {}
@@ -105,7 +106,7 @@ class GridworldEnv(gym.Env):
             info['success'] = True
             return (self.observation, 0, False, info)
 
-    def _reset(self):
+    def reset(self):
         self.agent_state = copy.deepcopy(self.agent_start_state)
         self.current_grid_map = copy.deepcopy(self.start_grid_map)
         self.observation = self._gridmap_to_observation(self.start_grid_map)
