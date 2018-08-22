@@ -39,10 +39,7 @@ class GridworldEnv(gym.Env):
         self.grid_map_shape = self.start_grid_map.shape
 
         ''' agent state: start, target, current state '''
-        self.agent_start_state, _ = self._get_agent_start_target_state(
-                                    self.start_grid_map)
-        _, self.agent_target_state = self._get_agent_start_target_state(
-                                    self.start_grid_map)
+        self.agent_start_state, self.agent_target_state = self._get_agent_start_target_state(self.start_grid_map)
         self.agent_state = copy.deepcopy(self.agent_start_state)
 
         ''' set other parameters '''
@@ -114,45 +111,43 @@ class GridworldEnv(gym.Env):
         return self.observation
 
     def _read_grid_map(self, grid_map_path):
-        grid_map = open(grid_map_path, 'r').readlines()
-        grid_map_array = []
-        for k1 in grid_map:
-            k1s = k1.split(' ')
-            tmp_arr = []
-            for k2 in k1s:
-                try:
-                    tmp_arr.append(int(k2))
-                except:
-                    pass
-            grid_map_array.append(tmp_arr)
-        grid_map_array = np.array(grid_map_array)
+        with open(grid_map_path, 'r') as f:
+            grid_map = f.readlines()
+        grid_map_array = np.array(
+            list(map(
+                lambda x: list(map(
+                    lambda y: int(y),
+                    x.split(' ')
+                )),
+                grid_map
+            ))
+        )
         return grid_map_array
 
     def _get_agent_start_target_state(self, start_grid_map):
         start_state = None
         target_state = None
-        for i in range(start_grid_map.shape[0]):
-            for j in range(start_grid_map.shape[1]):
-                this_value = start_grid_map[i,j]
-                if this_value == 4:
-                    start_state = [i,j]
-                if this_value == 3:
-                    target_state = [i,j]
-        if start_state is None or target_state is None:
+        start_state = list(map(
+            lambda x:x[0] if len(x) > 0 else None,
+            np.where(start_grid_map == 4)
+        ))
+        target_state = list(map(
+            lambda x:x[0] if len(x) > 0 else None,
+            np.where(start_grid_map == 3)
+        ))
+        if start_state == [None, None] or target_state == [None, None]:
             sys.exit('Start or target state not specified')
         return start_state, target_state
 
     def _gridmap_to_observation(self, grid_map, obs_shape=None):
         if obs_shape is None:
             obs_shape = self.obs_shape
-        observation = np.random.randn(*obs_shape)*0.0
+        observation = np.zeros(obs_shape, dtype=np.float32)
         gs0 = int(observation.shape[0]/grid_map.shape[0])
         gs1 = int(observation.shape[1]/grid_map.shape[1])
         for i in range(grid_map.shape[0]):
             for j in range(grid_map.shape[1]):
-                for k in range(3):
-                    this_value = COLORS[grid_map[i,j]][k]
-                    observation[i*gs0:(i+1)*gs0, j*gs1:(j+1)*gs1, k] = this_value
+                observation[i*gs0:(i+1)*gs0, j*gs1:(j+1)*gs1] = np.array(COLORS[grid_map[i,j]])
         return observation
   
     def _render(self, mode='human', close=False):
