@@ -96,7 +96,7 @@ class GridworldEnv(gym.Env):
         if nxt_agent_state[0] == self.agent_target_state[0] and nxt_agent_state[1] == self.agent_target_state[1] :
             target_observation = copy.deepcopy(self.observation)
             if self.restart_once_done:
-                self.observation = self._reset()
+                self.observation = self.reset()
                 info['success'] = True
                 return (self.observation, 1, True, info)
             else:
@@ -170,7 +170,7 @@ class GridworldEnv(gym.Env):
         ''' change agent start state '''
         ''' Input: sp: new start state '''
         if self.agent_start_state[0] == sp[0] and self.agent_start_state[1] == sp[1]:
-            _ = self._reset()
+            _ = self.reset()
             return True
         elif self.start_grid_map[sp[0], sp[1]] != 0:
             return False
@@ -182,14 +182,14 @@ class GridworldEnv(gym.Env):
             self.agent_start_state = [sp[0], sp[1]]
             self.observation = self._gridmap_to_observation(self.current_grid_map)
             self.agent_state = copy.deepcopy(self.agent_start_state)
-            self._reset()
+            self.reset()
             self._render()
         return True
         
     
     def change_target_state(self, tg):
         if self.agent_target_state[0] == tg[0] and self.agent_target_state[1] == tg[1]:
-            _ = self._reset()
+            _ = self.reset()
             return True
         elif self.start_grid_map[tg[0], tg[1]] != 0:
             return False
@@ -201,7 +201,7 @@ class GridworldEnv(gym.Env):
             self.agent_target_state = [tg[0], tg[1]]
             self.observation = self._gridmap_to_observation(self.current_grid_map)
             self.agent_state = copy.deepcopy(self.agent_start_state)
-            self._reset()
+            self.reset()
             self._render()
         return True
     
@@ -255,7 +255,7 @@ class GridworldEnv(gym.Env):
             self.observation = self._gridmap_to_observation(self.current_grid_map)
             self._render()
             if self.restart_once_done:
-                self.observation = self._reset()
+                self.observation = self.reset()
                 return (self.observation, 1, True, info)
             return (self.observation, 1, True, info)
         else:
