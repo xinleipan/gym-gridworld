@@ -3,7 +3,7 @@
 Basic implementation of gridworld game 
 for reinforcement learning research. This environment is used in the following paper:
 
-[How You Act Tells a Lot: Inferring Private Information from Policies](https://arxiv.org/abs/1904.11082)
+[How You Act Tells a Lot: Privacy-Leakage Attack on Deep Reinforcement Learning](https://arxiv.org/abs/1904.11082)
 
 Consider cite the paper:
 
