@@ -31,7 +31,7 @@ install virtual environment for gridworld
 
     cd gym-gridworld
     conda env create -f environment.yml
-    source gridworld
+    conda activate gridworld
     pip install -e .
 
 ## Use gym-gridworld
